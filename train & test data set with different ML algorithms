@@ -1,0 +1,301 @@
+# This Python 3 environment comes with many helpful analytics libraries installed
+# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
+# For example, here's several helpful packages to load
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+# Input data files are available in the read-only "../input/" directory
+# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+
+
+
+ds=pd.read_csv('/kaggle/input/insurance/insurance.csv')
+
+
+
+ds.head()
+
+
+ds.shape
+
+
+ds.info()
+
+
+ds.isnull().sum()
+
+
+ds.describe()
+
+
+sns.set()
+plt.figure(figsize=(6,6))
+sns.distplot(ds['age'])
+plt.title('AgeGraph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='sex',data=ds)
+plt.title('SexGraph')
+plt.show()
+
+
+ds['sex'].value_counts()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(ds['bmi'])
+plt.title('BMI Graph')
+plt.show()
+
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='children',data=ds)
+plt.title('Children Graph')
+plt.show()
+
+
+ds['children'].value_counts()
+
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='smoker',data=ds)
+plt.title('Smoker Graph')
+plt.show()
+
+
+ds['smoker'].value_counts()
+
+
+plt.figure(figsize=(6,6))
+sns.countplot(x='region',data=ds)
+plt.title('Region Graph')
+plt.show()
+
+
+ds['region'].value_counts()
+
+
+plt.figure(figsize=(6,6))
+sns.distplot(ds['charges'])
+plt.title('Chargs Graph')
+plt.show()
+
+
+ds['charges'].value_counts()
+
+
+ds.replace({'sex':{'male':0,'female':1}},inplace=True)
+ds.replace({'smoker':{'yes':0,'no':1}},inplace=True)
+ds.replace({'region':{'southeast':0,'southwest':1,'northeast':2,'northwest':3}},inplace=True)
+
+
+ds.head()
+
+
+x=ds.drop(columns='charges',axis=1)
+y=ds['charges']
+
+
+print(x)
+
+
+print(y)
+
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
+
+
+print(x.shape,x_train.shape,x_test.shape)
+
+
+regressor=LinearRegression()
+
+
+regressor.fit(x_train,y_train)
+
+
+training_data_prediction=regressor.predict(x_train)
+
+r2_train=metrics.r2_score(y_train,training_data_prediction)
+print('R squared value:',r2_train)
+
+
+test_data_prediction=regressor.predict(x_test)
+
+
+r2_test=metrics.r2_score(y_test,test_data_prediction)
+print('R squared value:',r2_test)
+
+
+id=(30,1,35.3,0,0,1)
+id_as_numpy_array=np.asarray(id)
+id_reshaped=id_as_numpy_array.reshape(1,-1)
+prediction=regressor.predict(id_reshaped)
+print(prediction)
+print('The cost is :',prediction[0])
+
+
+y_train
+
+
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
+
+
+svm=SVR()
+svm.fit(x_train,y_train)
+rf=RandomForestRegressor()
+rf.fit(x_train,y_train)
+gr=GradientBoostingRegressor()
+gr.fit(x_train,y_train)
+
+
+
+y_pred1=svm.predict(x_test)
+y_pred2=rf.predict(x_test)
+y_pred3=gr.predict(x_test)
+df1=pd.DataFrame({'Actual':y_test,'svm':y_pred1,'rf':y_pred2,'gr':y_pred3})
+
+
+df1
+
+
+import matplotlib.pyplot as plt
+
+
+
+plt.subplot(221)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['svm'].iloc[0:11],label="svr")
+plt.tight_layout()
+plt.legend()
+
+
+plt.subplot(222)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['rf'].iloc[0:11],label="rf")
+plt.tight_layout()
+plt.legend()
+
+
+plt.subplot(223)
+plt.plot(df1['Actual'].iloc[0:11],label='Actual')
+plt.plot(df1['gr'].iloc[0:11],label="gr")
+plt.tight_layout()
+plt.legend()
+
+
+score1=metrics.r2_score(y_test,y_pred1)
+score2=metrics.r2_score(y_test,y_pred2)
+score3=metrics.r2_score(y_test,y_pred3)
+
+
+
+print(score1,score2,score3)
+
+
+s1=metrics.mean_absolute_error(y_test,y_pred1)
+s2=metrics.mean_absolute_error(y_test,y_pred2)
+s3=metrics.mean_absolute_error(y_test,y_pred3)
+
+
+
+print(s1,s2,s3)
+
+
+data={'age':40,
+     'sex':1,
+     'bmi':40.30,
+     'children':4,
+     'smoker':1,
+     'region':2}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=gr.predict(df)
+print(new_pred)
+
+
+data={'age':40,
+     'sex':1,
+     'bmi':40.30,
+     'children':4,
+     'smoker':1,
+     'region':2}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=rf.predict(df)
+print(new_pred)
+
+
+data={'age':40,
+     'sex':1,
+     'bmi':40.30,
+     'children':4,
+     'smoker':1,
+     'region':2}
+df=pd.DataFrame(data,index=[0])
+df
+
+
+new_pred=svm.predict(df)
+print(new_pred)
+
+
+gr=GradientBoostingRegressor()
+gr.fit(x,y)
+
+
+import joblib
+joblib.dump(gr,'model_joblib_gr')
+
+
+model1=joblib.load('model_joblib_gr')
+model1.predict(df)
+
+
+rf=RandomForestRegressor()
+rf.fit(x,y)
+
+
+joblib.dump(rf,'model_joblib_rf')
+
+
+model2=joblib.load('model_joblib_rf')
+model2.predict(df)
+
+
+svm= SVR()
+svm.fit(x,y)
+
+
+joblib.dump(svm,'model_joblib_svm')
+
+
+model3=joblib.load('model_joblib_svm')
+model3.predict(df)
